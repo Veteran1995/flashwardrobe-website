@@ -4,10 +4,18 @@
     <Slider :slides="frontSettings" />
     <Brand />
     <Avert1 />
-    <NewArrival :products="trendyProducts" text="Trendy Products" />
+    <NewArrival
+      :products="trendyProducts"
+      text="Trendy Products"
+      description="Get The Trendy Products in Town Flashwardrobe"
+    />
     <!-- <TrendingProducts :products="trendyProducts" /> -->
     <Avert2 />
-    <NewArrival :products="newProducts" text="New Arrival" />
+    <NewArrival
+      :products="newProducts"
+      text="New Arrival"
+      description="Get The Latest Flashy Items in Town From Flashwardrobe"
+    />
   </div>
 </template>
 

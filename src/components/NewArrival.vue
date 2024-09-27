@@ -4,56 +4,7 @@
       <h2 class="title">{{ text }}</h2>
       <!-- End .title -->
 
-      <ul class="nav nav-pills justify-content-center" role="tablist">
-        <li class="nav-item">
-          <a
-            class="nav-link active"
-            id="new-all-link"
-            data-toggle="tab"
-            href="#new-all-tab"
-            role="tab"
-            aria-controls="new-all-tab"
-            aria-selected="true"
-            >All</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            id="new-cloth-link"
-            data-toggle="tab"
-            href="#new-cloth-tab"
-            role="tab"
-            aria-controls="new-cloth-tab"
-            aria-selected="false"
-            >Clothing</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            id="new-shoes-link"
-            data-toggle="tab"
-            href="#new-shoes-tab"
-            role="tab"
-            aria-controls="new-shoes-tab"
-            aria-selected="false"
-            >Shoes &amp; Boots</a
-          >
-        </li>
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            id="new-access-link"
-            data-toggle="tab"
-            href="#new-access-tab"
-            role="tab"
-            aria-controls="new-access-tab"
-            aria-selected="false"
-            >Accessories</a
-          >
-        </li>
-      </ul>
+      <p>{{ description }}</p>
     </div>
     <!-- End .heading -->
 
@@ -543,21 +494,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, defineEmits } from "vue";
+import { ref, onMounted, watch } from "vue";
 import NewArrivalProductCard from "./NewArrivalProductCard.vue";
 import { useStore } from "vuex";
 import { filter, forEach } from "lodash-es";
 import { getSalesPriceWithTax } from "../common/scripts/functions";
+import { message } from "ant-design-vue"; // Assuming you're using ant-design-vue
+
 const visible = ref(false);
-const currentProduct = ref([]);
+const currentProduct = ref({});
 const store = useStore();
-// Declare props directly using defineProps in script setup
+const emit = defineEmits(["customEvent"]); // Declare emit for custom events
+
+// Declare props using defineProps
 const props = defineProps({
   products: {
     type: Array,
-    required: true, // Ensure products is required and an array
+    required: true, // Ensure products is an array
   },
   text: {
+    type: String,
+    required: true, // Ensure text is required
+  },
+  description: {
     type: String,
     required: true, // Ensure text is required
   },
@@ -567,16 +526,19 @@ onMounted(() => {
   const cartItems = store.getters["front/storeCartItems"];
   let productQuantity = 0;
 
-  forEach(cartItems, (iee) => {
-    if (iee.xid == props.item.xid) {
-      productQuantity = iee.cart_quantity;
-    }
-  });
+  // Assuming you're working with a list of products and `props.products[0]`
+  if (props.products.length > 0) {
+    forEach(cartItems, (item) => {
+      if (item.xid == props.products[0].xid) {
+        productQuantity = item.cart_quantity;
+      }
+    });
 
-  currentProduct.value = {
-    ...props.item,
-    cart_quantity: productQuantity,
-  };
+    currentProduct.value = {
+      ...props.products[0], // Using the first product or any logic to select the product
+      cart_quantity: productQuantity,
+    };
+  }
 });
 
 const showModal = () => {
@@ -612,22 +574,27 @@ const addItem = (item) => {
   }
 
   store.commit("front/addCartItems", updatedCartItems);
-  message.success(`Item updated in cart`);
+  message.success("Item updated in cart");
 };
 
-watch(store.state.front, (newVal, oldVal) => {
-  let productQuantity = 0;
-  forEach(store.getters["front/storeCartItems"], (iee) => {
-    if (iee.xid == currentProduct.value.xid) {
-      productQuantity = iee.cart_quantity;
-    }
-  });
+watch(
+  () => store.getters["front/storeCartItems"],
+  (newCartItems) => {
+    let productQuantity = 0;
 
-  currentProduct.value = {
-    ...currentProduct.value,
-    cart_quantity: productQuantity,
-  };
-});
+    forEach(newCartItems, (item) => {
+      if (item.xid == currentProduct.value.xid) {
+        productQuantity = item.cart_quantity;
+      }
+    });
+
+    currentProduct.value = {
+      ...currentProduct.value,
+      cart_quantity: productQuantity,
+    };
+  },
+  { immediate: true }
+);
 
 // Custom event handler function
 const handleCustomEvent = (data) => {
@@ -635,6 +602,7 @@ const handleCustomEvent = (data) => {
   visible.value = true;
 };
 </script>
+
 <style scoped>
 .modal-dialog {
   max-width: 80%;

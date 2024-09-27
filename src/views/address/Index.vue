@@ -21,7 +21,7 @@
           </label>
           <p>
             {{ buildAddress(item) }}<br />
-            {{ $t("user.phone") }}: {{ item.phone }}
+            User Phone: {{ item.phone }}
           </p>
         </div>
       </li>

@@ -193,7 +193,8 @@
 
             <!-- Modal Footer -->
             <div class="modal-footer">
-              <button type="submit" class="btn btn-primary">
+              <ButtonLoader :isLoading="isLoading" />
+              <button type="submit" class="btn btn-primary" v-if="!isLoading">
                 <i class="icon-save"></i> Save
               </button>
               <button type="button" class="btn btn-secondary" @click="onClose">
@@ -206,27 +207,42 @@
     </div>
   </div>
 </template>
+
 <script>
-import { ref, onMounted, watch } from "vue";
+import { ref, watch, reactive } from "vue";
 import { useI18n } from "vue-i18n";
 import processRequestFront from "../../common/plugins/processRequestFront";
+import ButtonLoader from "@/components/ButtonLoader.vue";
+import { notification, message } from "ant-design-vue"; // Add this import
 
 export default {
   props: ["formData", "addEditVisible", "addEditId"],
   emits: ["addEditSuccess"],
-
+  components: {
+    ButtonLoader,
+  },
   setup(props, { emit }) {
-    const visible = ref(props.addEditVisible);
-    const address = ref(props.formData);
-    const rules = ref({});
+    const addEditVisible = ref(false);
+    const address = ref({ ...props.formData });
+    const rules = reactive({});
     const { t } = useI18n();
+    const isLoading = ref(false);
 
-    onMounted(() => {
-      visible.value = props.addEditVisible;
-      address.value = props.formData;
-    });
+    const validateForm = () => {
+      rules.name = address.value.name
+        ? null
+        : { message: t("common.required") };
+      // Additional validation for email, phone, etc.
+      return Object.keys(rules).every((key) => !rules[key]);
+    };
 
-    const onSubmit = () => {
+    const onSubmit = async () => {
+      if (!validateForm()) {
+        message.error(t("common.fix_errors"));
+        return;
+      }
+
+      isLoading.value = true;
       let url = "front/self/address";
       if (props.addEditId != null) {
         url = `front/self/address/${props.addEditId}`;
@@ -238,43 +254,56 @@ export default {
         success: (res) => {
           notification.success({
             placement: "bottomRight",
-            message: t("common.success"),
-            description: t("front.address_saved"),
+            message: "Sucess",
+            description: "Address saved successfully",
           });
-
+          props.addEditVisible = false;
+          isLoading.value = false;
           emit("addEditSuccess");
-          rules.value = {};
-          visible.value = false;
+          rules = {}; // Reset rules
+          addEditVisible = false;
+          isLoading.value = false;
         },
         error: (errorRules) => {
           rules.value = errorRules;
           message.error(t("common.fix_errors"));
+          isLoading.value = false;
         },
       });
     };
 
     const onClose = () => {
-      visible.value = false;
+      addEditVisible.value = false;
     };
+
+    // const showModal = () => {
+    //   visible.value = true;
+    // };
+
+    // const hideModal = () => {
+    //   visible.value = false;
+    // };
 
     watch(
       () => props.addEditVisible,
       (newVal) => {
-        visible.value = newVal;
-        address.value = props.formData;
+        addEditVisible.value = newVal;
+        address.value = { ...props.formData };
       }
     );
 
     return {
       address,
       rules,
-      visible,
+      addEditVisible,
       onSubmit,
       onClose,
+      isLoading,
     };
   },
 };
 </script>
+
 <style scoped>
 .modal-dialog {
   max-width: 50%;
@@ -282,7 +311,7 @@ export default {
 }
 
 .modal-content {
-  max-height: calc(100vh - 2rem); /* Make sure content is scrollable */
+  max-height: calc(100vh - 2rem);
   overflow-y: auto;
 }
 
