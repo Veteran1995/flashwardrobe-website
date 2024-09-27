@@ -1,0 +1,49 @@
+{
+  "name": "flashwordrobe",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
+    "@stripe/stripe-js": "^1.42.1",
+    "ant-design-vue": "4.1.2",
+    "axios": "^1.7.4",
+    "chart.js": "^3.6.0",
+    "dayjs": "^1.10.7",
+    "jsbarcode": "^3.11.5",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.5.23",
+    "lodash-es": "^4.17.21",
+    "moment": "^2.29.1",
+    "owl.carousel": "^2.3.4",
+    "print-js": "^1.6.0",
+    "resolve-url-loader": "^5.0.0",
+    "swiper": "^11.1.4",
+    "vue": "^3.4.29",
+    "vue-barcode-reader": "^1.0.3",
+    "vue-chart-3": "^3.1.8",
+    "vue-i18n": "^9.2.0-beta.32",
+    "vue-owl-carousel": "^2.0.3",
+    "vue-router": "^4.3.3",
+    "vue-scrollto": "^2.20.0",
+    "vue-template-compiler": "^2.6.14",
+    "vue3-colorpicker": "^2.0.4",
+    "vue3-perfect-scrollbar": "^2.0.0",
+    "vue3-print-nb": "^0.1.4",
+    "vue3-styled-components": "^1.2.1",
+    "vuex": "^4.0.2",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.5",
+    "@vitejs/plugin-vue-jsx": "^4.0.0",
+    "less": "^4.2.0",
+    "vite": "^5.3.1",
+    "vite-plugin-vue-devtools": "^7.3.1"
+  }
+}
